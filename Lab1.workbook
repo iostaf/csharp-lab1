@@ -1,0 +1,64 @@
+---
+packages:
+- id: CsvHelper
+  version: 15.0.1
+uti: com.xamarin.workbook
+id: cd620d65-d25a-4824-95dc-df8595345ba5
+title: Lab1
+platforms:
+- DotNetCore
+---
+
+### Reusable utilities
+
+```csharp
+public void PrintStats(int totalCount, int oddCount, int evenCount)
+{
+    Console.WriteLine($"Total: {totalCount}");
+    Console.WriteLine($"Odd: {oddCount}");
+    Console.WriteLine($"Even: {evenCount}");
+}
+```
+
+### Working example with in memory collection
+
+```csharp
+var numbers = Enumerable.Range(1, 50);
+
+var totalCount = numbers.Count();
+var oddCount = numbers.Count(it => it % 2 != 0);
+var evenCount = numbers.Count(it => it % 2 == 0);
+
+PrintStats(totalCount, oddCount, evenCount);
+```
+
+### Not working example with CsvHelper
+
+To make it work uncomment to add `ToList()` at line 17
+
+```csharp
+#r "CsvHelper"
+
+using System.IO;
+using System.Globalization;
+using CsvHelper;
+
+const string CsvFileName = "Numbers.csv";
+
+public class Entry
+{
+    public int Number { get; set; }
+}
+
+using (var reader = new StreamReader(CsvFileName))
+using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+{
+    var numbers = csvReader.GetRecords<Entry>(); // .ToList(); // TODO: Uncomment me to fix the issue
+
+    var totalCount = numbers.Count();
+    var oddCount = numbers.Count(it => it.Number % 2 != 0);
+    var evenCount = numbers.Count(it => it.Number % 2 == 0);
+    
+    PrintStats(totalCount, oddCount, evenCount);
+}
+```
